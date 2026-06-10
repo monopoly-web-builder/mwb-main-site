@@ -3,11 +3,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { Mail, Phone, MapPin, Send } from "lucide-react";
+import { Mail, MapPin, Send } from "lucide-react";
 
 const Contact = () => {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -16,24 +17,47 @@ const Contact = () => {
     message: "",
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    const subject = encodeURIComponent(`Website Enquiry from ${formData.name}`);
-    const body = encodeURIComponent(
-      `Name: ${formData.name}\n` +
-      `Email: ${formData.email}\n` +
-      `Phone: ${formData.phone || 'Not provided'}\n` +
-      `Business: ${formData.business || 'Not provided'}\n\n` +
-      `Message:\n${formData.message}`
-    );
-    
-    window.location.href = `mailto:info@monopolywebbuilder.com?subject=${subject}&body=${body}`;
-    
-    toast({
-      title: "Opening your email client",
-      description: "Please send the email to complete your enquiry.",
-    });
+    setIsSubmitting(true);
+
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to send enquiry");
+      }
+
+      toast({
+        title: "Enquiry Sent",
+        description: "Thank you. We will contact you shortly.",
+      });
+
+      setFormData({
+        name: "",
+        email: "",
+        phone: "",
+        business: "",
+        message: "",
+      });
+    } catch (error) {
+      console.error(error);
+
+      toast({
+        title: "Error",
+        description:
+          "There was a problem sending your enquiry. Please email info@monopolywebbuilder.com directly.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleChange = (
@@ -57,7 +81,7 @@ const Contact = () => {
             Let's Build Your Website
           </h2>
           <p className="text-muted-foreground text-lg">
-            Ready to get your business online? Fill in the form below and we'll 
+            Ready to get your business online? Fill in the form below and we'll
             be in touch to discuss your project.
           </p>
         </div>
@@ -107,7 +131,7 @@ const Contact = () => {
                 No pressure, no obligation
               </p>
               <p className="text-muted-foreground text-sm">
-                We're happy to answer questions and give you a clear idea of 
+                We're happy to answer questions and give you a clear idea of
                 costs before you commit to anything.
               </p>
             </div>

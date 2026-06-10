@@ -16,7 +16,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     await resend.emails.send({
-      from: "Monopoly Web Builder <onboarding@resend.dev>",
+      from: "Monopoly Web Builder <info@monopolywebbuilder.com>",
       to: "info@monopolywebbuilder.com",
       replyTo: email,
       subject: `New MWB Enquiry - ${business || name}`,

@@ -15,7 +15,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(400).json({ error: "Missing required fields" });
     }
 
-    await resend.emails.send({
+    console.log("Contact form received:", { name, email, phone, business });
+
+    const result = await resend.emails.send({
       from: "Monopoly Web Builder <info@monopolywebbuilder.com>",
       to: "info@monopolywebbuilder.com",
       replyTo: email,
@@ -32,7 +34,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       `,
     });
 
-    return res.status(200).json({ success: true });
+    console.log("RESEND RESULT:", JSON.stringify(result));
+
+    return res.status(200).json({ success: true, result });
   } catch (error) {
     console.error("Contact form error:", error);
     return res.status(500).json({ error: "Failed to send enquiry" });
